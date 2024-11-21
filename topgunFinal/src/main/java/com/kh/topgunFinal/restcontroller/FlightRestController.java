@@ -18,6 +18,10 @@ import com.kh.topgunFinal.dto.FlightDto;
 import com.kh.topgunFinal.vo.FlightComplexSearchRequestVO;
 import com.kh.topgunFinal.vo.FlightComplexSearchResponseVO;
 import com.kh.topgunFinal.vo.FlightVO;
+import com.kh.topgunFinal.vo.SeatsCountVO;
+
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 
 @CrossOrigin(origins = {"http://localhost:3000"})
@@ -33,6 +37,12 @@ public class FlightRestController {
 	public List<FlightVO> list() {
 		return flightDao.selectList();
 	}
+
+	@GetMapping("/seatsCountList/{flightId}")
+    public List<SeatsCountVO> seatsCountList(@PathVariable int flightId) {
+        return flightDao.seatsCount(flightId);
+    }
+
 	//검색 
 	@GetMapping("/column/{column}/keyword/{keyword}")
 	public List<FlightDto> search(

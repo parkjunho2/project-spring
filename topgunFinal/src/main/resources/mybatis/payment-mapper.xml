@@ -157,7 +157,6 @@
 		update payment_detail set payment_detail_status='취소' where payment_detail_no = #{paymentDetailNo}
 	</update>
 	
-	
 	<update id="decreaseItemRemain">
 		update payment set payment_remain = payment_remain - #{money} where payment_no = #{paymentNo}
 	</update>
@@ -212,6 +211,21 @@
             AIRLINE a ON f.USER_ID = a.USER_ID
         where s.flight_id = #{flightId}
     </select>
-	
-	
+	<select id="exists" parameterType="map" resultType="int">
+    SELECT COUNT(*)
+    FROM seats
+    WHERE flight_id = #{flightId}
+      AND seats_no = #{seatsNo}
+      AND seats_status = '사용'
+</select>
+
+<select id="timerList" resultType="TimerVO">
+SELECT 
+    p.payment_no, 
+    p.flight_id, 
+    f.arrival_time
+FROM payment p
+LEFT JOIN flight f ON p.flight_id = f.flight_id
+WHERE p.payment_no = #{paymentNo}
+</select>	
 </mapper>

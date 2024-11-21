@@ -68,25 +68,42 @@
     SELECT * FROM seats WHERE flight_id = #{flightId} FOR UPDATE
 </select>
 		
-		<select id= "flightPassangerInfo" resultType="FlightPassangerInfoVO">
-		SELECT 
-    f.flight_id,
-    pd.payment_detail_name,
-    pd.payment_detail_passport,
-    pd.payment_detail_passanger,
-    pd.payment_detail_english,
-    pd.payment_detail_sex,
-    pd.payment_detail_birth,
-    pd.payment_detail_country,
-    pd.payment_detail_visa,
-    pd.payment_detail_expire
-FROM 
-    flight f
-JOIN 
-    payment_detail pd ON f.flight_id = pd.flight_id
-WHERE 
-    f.flight_id = #{flightId} AND
-    pd.payment_detail_status = '승인'
+	<select id= "flightPassangerInfo" resultType="FlightPassangerInfoVO">
+				SELECT 
+			f.flight_id,
+			pd.payment_detail_name,
+			pd.payment_detail_passport,
+			pd.payment_detail_passanger,
+			pd.payment_detail_english,
+			pd.payment_detail_sex,
+			pd.payment_detail_birth,
+			pd.payment_detail_country,
+			pd.payment_detail_visa,
+			pd.payment_detail_expire
+		FROM 
+			flight f
+		JOIN 
+			payment_detail pd ON f.flight_id = pd.flight_id
+		WHERE 
+			f.flight_id = #{flightId} AND
+			pd.payment_detail_status = '승인'
 		</select>
-		
+
+	<select id="seatsCount" resultType="SeatsCountVO">   	
+				SELECT 
+			f.FLIGHT_ID,
+			count(s.seats_no) AS total_seats_no,
+			count(CASE WHEN s.seats_status = '미사용' THEN 1 END) AS unused_seats_count
+		FROM 
+			flight f
+		LEFT JOIN 
+			seats s
+		ON 
+			f.FLIGHT_ID = s.FLIGHT_ID
+		WHERE 
+			f.FLIGHT_ID = #{flightId}
+		GROUP BY 
+			f.FLIGHT_ID
+		</select>
+
 </mapper>

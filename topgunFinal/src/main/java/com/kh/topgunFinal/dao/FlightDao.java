@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import com.kh.topgunFinal.dto.FlightDto;
 import com.kh.topgunFinal.vo.FlightComplexSearchRequestVO;
 import com.kh.topgunFinal.vo.FlightVO;
+import com.kh.topgunFinal.vo.SeatsCountVO;
 
 @Repository
 public class FlightDao {
@@ -99,6 +100,11 @@ public class FlightDao {
 	public String selectArrival(int flightId) {
 		return sqlSession.selectOne("flight.getArrivalAirport", flightId);
 	}
+
+    //항공편 좌석 수
+    public List<SeatsCountVO> seatsCount(int flightId){
+        return sqlSession.selectList("seats.seatsCount", flightId);
+    }
 
 }
 
