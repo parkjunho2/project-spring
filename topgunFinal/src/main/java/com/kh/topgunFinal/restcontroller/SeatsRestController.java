@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -33,6 +34,7 @@ import com.kh.topgunFinal.vo.SeatsApproveRequestVO;
 import com.kh.topgunFinal.vo.SeatsFlightInfoVO;
 import com.kh.topgunFinal.vo.SeatsPurchaseRequestVO;
 import com.kh.topgunFinal.vo.SeatsQtyVO;
+import com.kh.topgunFinal.vo.TimerVO;
 import com.kh.topgunFinal.vo.UserClaimVO;
 import com.kh.topgunFinal.vo.pay.PayApproveRequestVO;
 import com.kh.topgunFinal.vo.pay.PayApproveResponseVO;
@@ -47,7 +49,7 @@ import com.kh.topgunFinal.vo.pay.PayReadyResponseVO;
 @RestController
 @RequestMapping("/seats")
 public class SeatsRestController {
-	
+
 	@Autowired
 	private FlightDao flightDao;
 
@@ -62,54 +64,68 @@ public class SeatsRestController {
 
 	@Autowired
 	private PaymentDao paymentDao;
-	
+
 	@Autowired
 	private SqlSession sqlSession;
-	
-	//좌석 조회
+
+	// 좌석 조회
 	@GetMapping("/{flightId}") // 비워두면 /seats/{flightId}에 대한 GET 요청이 됩니다.
 	public List<SeatsDto> list(@PathVariable int flightId) {
-	    return seatsDao.selectList(flightId); // 항공편 ID를 DAO 메서드에 전달
+		return seatsDao.selectList(flightId); // 항공편 ID를 DAO 메서드에 전달
 	}
-	//항공편 정보 조회
+
+	// 항공편 정보 조회
 	@GetMapping("/info/{flightId}")
 	public List<SeatsFlightInfoVO> flightInfoVO(@PathVariable int flightId) {
-	    return paymentDao.seatsFlightInfo(flightId);
+		return paymentDao.seatsFlightInfo(flightId);
 	}
-	//항공기 탑승자 명단 조회
+
+	// 항공기 탑승자 명단 조회
 	@GetMapping("/passanger/{flightId}")
-    public List<FlightPassangerInfoVO> getPassengerInfo(@PathVariable int flightId) {
-        return seatsDao.passangerInfo(flightId);
+	public List<FlightPassangerInfoVO> getPassengerInfo(@PathVariable int flightId) {
+		return seatsDao.passangerInfo(flightId);
+	}
+	//구매하기버튼 클릭 중복검사
+	@PostMapping("/exist")
+    public void checkDuplicate(@RequestBody List<SeatsQtyVO> seatsList) {
+        // 좌석 리스트 순회하며 중복 체크
+        for (SeatsQtyVO seatRequest : seatsList) {
+            int count = paymentDao.exists(seatRequest.getFlightId(), seatRequest.getSeatsNo());
+            if (count > 0) {
+                throw new TargetNotFoundException("이미 결제된 좌석입니다: " + seatRequest.getSeatsNo());
+            }
+        }
     }
-	
+
 	// 좌석 구매
 	@PostMapping("/purchase")
 	public PayReadyResponseVO purchase(@RequestHeader("Authorization") String token, // 회원토큰
 			@RequestBody SeatsPurchaseRequestVO request) throws URISyntaxException {
 		UserClaimVO claimVO = // 회원 아이디 불러옴
 				tokenService.check(tokenService.removeBearer(token));
-		List<SeatsFlightInfoVO> flightInfoList = paymentDao.seatsFlightInfo(request.getSeatsList().get(0).getFlightId());
+		List<SeatsFlightInfoVO> flightInfoList = paymentDao
+				.seatsFlightInfo(request.getSeatsList().get(0).getFlightId());
 		List<SeatsDto> seatsList = seatsDao.selectList(request.getSeatsList().get(0).getFlightId());
 		int flightPrice = flightInfoList.get(0).getFlightPrice();
 		String arrival = flightDao.selectArrival(request.getSeatsList().get(0).getFlightId());
 		StringBuffer buffer = new StringBuffer();
 		int total = 0;
-		    for (SeatsQtyVO vo : request.getSeatsList()) {
-		        SeatsDto seatDto = seatsList.stream()
-		                .filter(seat -> seat.getSeatsNo() == vo.getSeatsNo())
-		                .findFirst()
-		                .orElseThrow(() -> new TargetNotFoundException("결제 대상 없음"));
-		        total += (seatDto.getSeatsPrice()+flightPrice) * vo.getQty() ;
-		        if (buffer.isEmpty()) {
-		            buffer.append(flightInfoList.get(0).getAirlineName() +" ");
-		            buffer.append(arrival+"행 ");
-		            buffer.append(seatDto.getSeatsRank());
-		            buffer.append(seatDto.getSeatsNumber()+" ");
-		        }
-		    }
-		if(request.getSeatsList().size()>=2) { //2좌석 이상 구매시
-			buffer.append(" 외 " +(request.getSeatsList().size()-1)+"건 ");
- 		}
+		for (SeatsQtyVO vo : request.getSeatsList()) {
+			SeatsDto seatDto = seatsList.stream()
+					.filter(seat -> seat.getSeatsNo() == vo.getSeatsNo())
+					.findFirst()
+					.orElseThrow(() -> new TargetNotFoundException("결제 대상 없음"));
+			total += (seatDto.getSeatsPrice() + flightPrice) * vo.getQty();
+			if (buffer.isEmpty()) {
+				buffer.append(flightInfoList.get(0).getAirlineName() + " ");
+				buffer.append(arrival + "행 ");
+				buffer.append(seatDto.getSeatsRank());
+				buffer.append(seatDto.getSeatsNumber() + " ");
+			}
+		}
+		if (request.getSeatsList().size() >= 2) { // 2좌석 이상 구매시
+			buffer.append(" 외 " + (request.getSeatsList().size() - 1) + "건 ");
+		}
 		// payService #4에 body에 해당
 		// ready 준비 (입력)
 		PayReadyRequestVO requestVO = new PayReadyRequestVO();
@@ -135,47 +151,56 @@ public class SeatsRestController {
 
 		UserClaimVO claimVO = // 아이디 토큰 불러옴
 				tokenService.check(tokenService.removeBearer(token));
+
+		// 중복 좌석 체크
+		for (SeatsQtyVO seatRequest : request.getSeatsList()) {
+			int count = paymentDao.exists(seatRequest.getFlightId(), seatRequest.getSeatsNo());
+			if (count > 0) {
+				throw new TargetNotFoundException("이미 결제된 좌석입니다: " + seatRequest.getSeatsNo());
+			}
+		}
+
 		// approve 준비 (입력)
-		
 		PayApproveRequestVO requestVO = new PayApproveRequestVO();
 		requestVO.setPartnerOrderId(request.getPartnerOrderId());
 		requestVO.setPartnerUserId(claimVO.getUserId());
 		requestVO.setTid(request.getTid());
 		requestVO.setPgToken(request.getPgToken());
+
 		// approve 처리 client에 전송
 		PayApproveResponseVO responseVO = payService.approve(requestVO);
-		
+
 		// DB저장
 		// [1]대표 정보 등록
-		 int flightPrice = flightDao.selectPrice(request.getSeatsList().get(0).getFlightId());
-		 int paymentSeq = paymentDao.paymentSequence();
-		 
-		 PaymentDto paymentDto = new PaymentDto();
-		 paymentDto.setPaymentNo(paymentSeq);//결제번호
-		 paymentDto.setPaymentTid(responseVO.getTid());////거래번호
-		 paymentDto.setFlightId(request.getSeatsList().get(0).getFlightId());
-		 paymentDto.setPaymentName(responseVO.getItemName());//상품명
-		 paymentDto.setPaymentTotal(responseVO.getAmount().getTotal());//총결제금액
-		 paymentDto.setPaymentRemain(paymentDto.getPaymentTotal());//취소가능금액
-		 paymentDto.setUserId(claimVO.getUserId());//결제한 아이디
-		 paymentDao.paymentInsert(paymentDto);//대표정보 등록
-		
+		int flightPrice = flightDao.selectPrice(request.getSeatsList().get(0).getFlightId());
+		int paymentSeq = paymentDao.paymentSequence();
+
+		PaymentDto paymentDto = new PaymentDto();
+		paymentDto.setPaymentNo(paymentSeq);// 결제번호
+		paymentDto.setPaymentTid(responseVO.getTid());//// 거래번호
+		paymentDto.setFlightId(request.getSeatsList().get(0).getFlightId());
+		paymentDto.setPaymentName(responseVO.getItemName());// 상품명
+		paymentDto.setPaymentTotal(responseVO.getAmount().getTotal());// 총결제금액
+		paymentDto.setPaymentRemain(paymentDto.getPaymentTotal());// 취소가능금액
+		paymentDto.setUserId(claimVO.getUserId());// 결제한 아이디
+		paymentDao.paymentInsert(paymentDto);// 대표정보 등록
+
 		// [2]상세 정보 등록
-		 List<SeatsDto> seatsList = seatsDao.selectList(request.getSeatsList().get(0).getFlightId());
-			for(SeatsQtyVO qtyVO : request.getSeatsList()) {//tid,pg_token,partner_orderId
-				SeatsDto seatsDto = seatsList.stream()
-						.filter(seat -> seat.getSeatsNo() == qtyVO.getSeatsNo())
-						.findFirst()
-						.orElseThrow(() -> new TargetNotFoundException("존재하지 않는 좌석입니다"));
-		 	int paymentDetailSeq= paymentDao.paymentDetailSequence();//번호추출
-		 	PaymentDetailDto paymentDetailDto = new PaymentDetailDto();
-		 	paymentDetailDto.setPaymentDetailNo(paymentDetailSeq);// 번호 설정
-		 	paymentDetailDto.setFlightId(seatsDto.getFlightId());//항공기번호
-		 	paymentDetailDto.setPaymentDetailName(seatsDto.getSeatsRank() + seatsDto.getSeatsNumber());// 좌석번호
-		 	paymentDetailDto.setPaymentDetailPrice(seatsDto.getSeatsPrice()+flightPrice);// 좌석판매가
-		 	paymentDetailDto.setPaymentDetailSeatsNo(seatsDto.getSeatsNo());// 좌석별고유번호
-		 	paymentDetailDto.setPaymentDetailQty(qtyVO.getQty());// 구매수량
-		 	paymentDetailDto.setPaymentDetailOrigin(paymentSeq);// 어느소속에 상세번호인지
+		List<SeatsDto> seatsList = seatsDao.selectList(request.getSeatsList().get(0).getFlightId());
+		for (SeatsQtyVO qtyVO : request.getSeatsList()) {// tid,pg_token,partner_orderId
+			SeatsDto seatsDto = seatsList.stream()
+					.filter(seat -> seat.getSeatsNo() == qtyVO.getSeatsNo())
+					.findFirst()
+					.orElseThrow(() -> new TargetNotFoundException("존재하지 않는 좌석입니다"));
+			int paymentDetailSeq = paymentDao.paymentDetailSequence();// 번호추출
+			PaymentDetailDto paymentDetailDto = new PaymentDetailDto();
+			paymentDetailDto.setPaymentDetailNo(paymentDetailSeq);// 번호 설정
+			paymentDetailDto.setFlightId(seatsDto.getFlightId());// 항공기번호
+			paymentDetailDto.setPaymentDetailName(seatsDto.getSeatsRank() + seatsDto.getSeatsNumber());// 좌석번호
+			paymentDetailDto.setPaymentDetailPrice(seatsDto.getSeatsPrice() + flightPrice);// 좌석판매가
+			paymentDetailDto.setPaymentDetailSeatsNo(seatsDto.getSeatsNo());// 좌석별고유번호
+			paymentDetailDto.setPaymentDetailQty(qtyVO.getQty());// 구매수량
+			paymentDetailDto.setPaymentDetailOrigin(paymentSeq);// 어느소속에 상세번호인지
 			paymentDetailDto.setPaymentDetailPassport(qtyVO.getPaymentDetailPassport());
 			paymentDetailDto.setPaymentDetailPassanger(qtyVO.getPaymentDetailPassanger());
 			paymentDetailDto.setPaymentDetailEnglish(qtyVO.getPaymentDetailEnglish());
@@ -184,9 +209,9 @@ public class SeatsRestController {
 			paymentDetailDto.setPaymentDetailCountry(qtyVO.getPaymentDetailCountry());
 			paymentDetailDto.setPaymentDetailVisa(qtyVO.getPaymentDetailVisa());
 			paymentDetailDto.setPaymentDetailExpire(qtyVO.getPaymentDetailExpire());
-		 	seatsDao.seatsStatus(seatsDto);//결제시 사용으로 변경
-		 	paymentDao.paymentDetailInsert(paymentDetailDto);
-		 }
+			seatsDao.seatsStatus(seatsDto);// 결제시 사용으로 변경
+			paymentDao.paymentDetailInsert(paymentDetailDto);
+		}
 		// approve 출력
 		return responseVO;
 	}
@@ -198,7 +223,7 @@ public class SeatsRestController {
 		List<PaymentDto> list = paymentDao.selectList(claimVO.getUserId());
 		return list;
 	}
-	
+
 	// 구매 내역 상세 조회
 	@GetMapping("/paymentlist/{paymentNo}")
 	public List<PaymentDetailDto> paymentDetailList(@RequestHeader("Authorization") String token,
@@ -245,8 +270,10 @@ public class SeatsRestController {
 		requestVO.setTid(paymentDto.getPaymentTid());
 		PayOrderResponseVO responseVO = payService.order(requestVO);
 
+		List<TimerVO> timerList = paymentDao.timerList(paymentNo);
 		// 반환 형태 생성
 		PaymentInfoVO infoVO = new PaymentInfoVO();
+		infoVO.setTimerVO(timerList);
 		infoVO.setPaymentDto(paymentDto);
 		infoVO.setPaymentDetailList(list);
 		infoVO.setResponseVO(responseVO);
@@ -307,16 +334,23 @@ public class SeatsRestController {
 		paymentDao.decreaseItemRemain(paymentDto.getPaymentNo(), money);
 		return response;
 	}
-	//정보 업데이트
+
+	// 정보 업데이트
 	@PutMapping("/detailUpdate")
 	public void update(@RequestBody PaymentDetailDto paymentDetailDto) {
 		paymentDao.updatePaymentDetail(paymentDetailDto);
 	}
-	
+
 	// 좌석과 항공편 정보를 조회하는 메서드
-    @GetMapping("/flightInfoList") 
-    public List<SeatsFlightInfoVO> seatsFlightInfoList() {
-        return sqlSession.selectList("payment.seatsFlightInfoList");
+	@GetMapping("/flightInfoList")
+	public List<SeatsFlightInfoVO> seatsFlightInfoList() {
+		return sqlSession.selectList("payment.seatsFlightInfoList");
+	}
+	//이거에 맞는 결제페이지 만들어야 함
+	@GetMapping("/payment/{id}/success/{status}")
+    public String showSuccessPage(@PathVariable Long id, @PathVariable String status) {
+        // 해당 로직 처리 후 뷰 반환
+        return "payment/success";  // success.html 또는 다른 뷰 이름
     }
-   
+	
 }

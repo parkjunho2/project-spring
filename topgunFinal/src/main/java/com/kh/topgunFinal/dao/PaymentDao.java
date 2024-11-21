@@ -12,6 +12,7 @@ import com.kh.topgunFinal.dto.PaymentDetailDto;
 import com.kh.topgunFinal.dto.PaymentDto;
 import com.kh.topgunFinal.vo.PaymentTotalVO;
 import com.kh.topgunFinal.vo.SeatsFlightInfoVO;
+import com.kh.topgunFinal.vo.TimerVO;
 
 @Repository
 public class PaymentDao {
@@ -84,7 +85,14 @@ public class PaymentDao {
     }
     
    //DB 데이터 중복확인
-//    public boolean existsByParterOrderId(String partnerOrderId) {
-//        return sqlSession.selectOne("payment.existsByParterOrderId", partnerOrderId);
-//    }
+   public int exists(int flightId, int seatsNo) {
+    Map<String, Integer> params = new HashMap<>();
+    params.put("flightId", flightId);
+    params.put("seatsNo", seatsNo);
+    return sqlSession.selectOne("payment.exists", params);
+}
+
+	public List<TimerVO> timerList(int paymentNo) {
+		return sqlSession.selectList("payment.timerList", paymentNo);  // selectList 사용
+	}
 }

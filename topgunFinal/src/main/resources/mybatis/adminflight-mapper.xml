@@ -9,7 +9,7 @@
 
 <!-- 목록 -->
 <select id="list" resultType="FlightDto">
-    select * from flight order by flight_id asc
+    select * from flight order by flight_id desc
 </select>
 
 <!-- 상세 -->

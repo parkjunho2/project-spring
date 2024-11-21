@@ -13,4 +13,5 @@ public class PaymentInfoVO {
 	private PaymentDto paymentDto;
 	private List<PaymentDetailDto> paymentDetailList;
 	private PayOrderResponseVO responseVO;
+	private List<TimerVO> timerVO;
 }

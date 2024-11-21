@@ -2,28 +2,48 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="graph">
-    <!-- 특정 사용자 ID로 결제 및 항공사 정보를 조회하는 쿼리 -->
-    <select id="getTotalPaymentWithAirline" parameterType="String" resultType="com.kh.topgunFinal.dto.FlightPaymentDto">
-        SELECT f.flight_number,
-               SUM(p.payment_total) AS total_payment,
-               a.airline_name
+    <select id="flightPayment" parameterType="String" resultType="FlightPaymentVO">
+        SELECT 
+        f.flight_number,
+        COALESCE(SUM(p.payment_total), 0) AS total_payment,
+        a.airline_name
         FROM flight f
-        JOIN payment p ON f.flight_id = p.flight_id
+        LEFT JOIN payment p ON f.flight_id = p.flight_id  
         JOIN airline a ON f.user_id = a.user_id
-        WHERE f.user_id = #{userId}  <!-- userId를 파라미터로 받음 -->
+        WHERE f.user_id = #{userId}
         GROUP BY f.flight_number, a.airline_name
-        ORDER BY f.flight_number
+        ORDER BY total_payment asc
     </select>
 
     <!-- 모든 사용자에 대한 결제 및 항공사 정보를 조회하는 쿼리 -->
-    <select id="getAllPaymentsWithAirline" resultType="com.kh.topgunFinal.dto.FlightPaymentDto">
-        SELECT f.flight_number,
-               SUM(p.payment_total) AS total_payment,
-               a.airline_name
-        FROM flight f
-        JOIN payment p ON f.flight_id = p.flight_id
-        JOIN airline a ON f.user_id = a.user_id
-        GROUP BY f.flight_number, a.airline_name
-        ORDER BY f.flight_number
+    <select id="allFlightPayment" resultType="FlightPaymentVO">
+            SELECT 
+        f.flight_number,
+        SUM(p.payment_total) AS total_payment,
+        a.airline_name,
+        f.DEPARTURE_TIME,
+        CASE 
+            WHEN EXTRACT(month FROM f.DEPARTURE_TIME) = 10 THEN '10월'
+            WHEN EXTRACT(month FROM f.DEPARTURE_TIME) = 11 THEN '11월'
+            WHEN EXTRACT(month FROM f.DEPARTURE_TIME) = 12 THEN '12월'
+            WHEN EXTRACT(month FROM f.DEPARTURE_TIME) = 1 THEN '1월'
+            ELSE '기타'  -- 다른 월을 처리하는 경우
+        END AS month
+    FROM flight f
+    JOIN payment p ON f.flight_id = p.flight_id
+    JOIN airline a ON f.user_id = a.user_id
+    GROUP BY 
+        f.flight_number, 
+        a.airline_name, 
+        f.DEPARTURE_TIME,
+        CASE 
+            WHEN EXTRACT(month FROM f.DEPARTURE_TIME) = 10 THEN '10월'
+            WHEN EXTRACT(month FROM f.DEPARTURE_TIME) = 11 THEN '11월'
+            WHEN EXTRACT(month FROM f.DEPARTURE_TIME) = 12 THEN '12월'
+            WHEN EXTRACT(month FROM f.DEPARTURE_TIME) = 1 THEN '1월'
+            ELSE '기타'
+        END
+    ORDER BY 
+        month, f.flight_number
     </select>
 </mapper>

@@ -35,7 +35,7 @@ public class CreateSeatService {
 				if ("비즈니스".equals(seatRank)) {
 					seat.setSeatsPrice(80000); // 비즈니스 좌석이면 80,000원
 				} else {
-					seat.setSeatsPrice(40000); // 이코노미 좌석이면 40,000원
+					seat.setSeatsPrice(0); // 이코노미 좌석이면 0원
 				}
 
 				// seatList에 추가
