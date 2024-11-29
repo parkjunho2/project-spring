@@ -27,7 +27,7 @@
             WHEN EXTRACT(month FROM f.DEPARTURE_TIME) = 11 THEN '11월'
             WHEN EXTRACT(month FROM f.DEPARTURE_TIME) = 12 THEN '12월'
             WHEN EXTRACT(month FROM f.DEPARTURE_TIME) = 1 THEN '1월'
-            ELSE '기타'  -- 다른 월을 처리하는 경우
+            ELSE '기타'
         END AS month
     FROM flight f
     JOIN payment p ON f.flight_id = p.flight_id

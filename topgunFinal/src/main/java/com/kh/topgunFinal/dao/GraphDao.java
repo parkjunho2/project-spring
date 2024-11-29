@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import com.kh.topgunFinal.vo.FlightPaymentVO;
 
 @Repository
-public class GraphDataDao {
+public class GraphDao {
 
     @Autowired
     private SqlSession sqlSession;
