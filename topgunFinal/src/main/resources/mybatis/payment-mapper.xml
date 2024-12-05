@@ -56,15 +56,7 @@
         payment_detail_visa = #{paymentDetailVisa,jdbcType=VARCHAR},
         payment_detail_expire = #{paymentDetailExpire,jdbcType=VARCHAR} 
     WHERE payment_detail_no = #{paymentDetailNo}
-</update>
-
-<!-- 확인필요
- <select id="existsByPartnerOrderId" parameterType="string" resultType="boolean">
-        SELECT COUNT(*)
-        FROM payment
-        WHERE payment_tid = #{tid}
-    </select>
- -->
+    </update>
 
     <!-- 정보 조회 -->
     <select id="list" resultType="PaymentDto">
@@ -84,13 +76,6 @@
 	</select>
 	
 	<!--  계층형 조회-->
-        <!-- <association property="flightDto">
-            <result column="departure_time" property="departureTime"/>        
-            <result column="departrue_airport" property="departureAirport"/>        
-            <result column="arrival_time" property="arrivalTime"/>        
-            <result column="flight_time" property="flightTime"/>      
-            <result column="arrival_airport" property="arrivalAirport"/>
-        </association> -->
 	<resultMap type="PaymentTotalVO" id="paymentTotalVO">
 		<association property="paymentDto">
 			<result column="payment_no" property="paymentNo"/>
@@ -164,7 +149,8 @@
 	<select id="selectDetailOne" resultType="PaymentDetailDto">
 		select * from payment_detail where payment_detail_no = #{paymentDetailNo}
 	</select>
-	<!-- 좌석 및 항공편 정보를 조회하는 새로운 쿼리 추가 -->
+
+	<!-- 좌석 및 항공편 정보를 조회 -->
 	<select id="seatsFlightInfoList" resultType="SeatsFlightInfoVO">
     SELECT 
         s.SEATS_NO,
@@ -186,7 +172,7 @@
         FLIGHT f ON s.FLIGHT_ID = f.FLIGHT_ID
     JOIN 
         AIRLINE a ON f.USER_ID = a.USER_ID
-</select>
+    </select>
 	
     <select id="seatsFlightInfo" resultType="SeatsFlightInfoVO">
         SELECT 
@@ -211,6 +197,7 @@
             AIRLINE a ON f.USER_ID = a.USER_ID
         where s.flight_id = #{flightId}
     </select>
+
 	<select id="exists" parameterType="map" resultType="int">
     SELECT COUNT(*)
     FROM seats

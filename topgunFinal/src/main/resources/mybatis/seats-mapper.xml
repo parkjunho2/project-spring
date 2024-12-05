@@ -19,13 +19,6 @@
 		update seats set seats_status='사용' where seats_no = #{seatsNo} and flight_id = #{flightId}
 	</update>
 	
-	<!-- 결제 취소시 상태 미사용 
-
-	<update id="cancelSeats" >
-		update seats set seats_status='미사용' where seats_no = #{seatsNo} and flight_id= #{flightId}
-	</update>
-	-->
-	
 	<!-- 목록 -->
 	<select id="list" resultType="seatsDto">
 		select * from seats order by
@@ -44,9 +37,8 @@
 		SELECT * FROM seats WHERE flight_id = #{flightId} ORDER BY
 		seats_no ASC
 	</select>
-	<!-- <select id="selectOne" parameterType="int" resultType="SeatsDto"> SELECT 
-		* FROM seats WHERE seats_no = #{seatsNo} </select> -->
-		<!-- 항공사명 불러오기 -->
+
+		<!-- 항공기 정보 불러오기 -->
 		 <select id="selectSeatsWithAirline" resultType="SeatsDto">
         SELECT 
             s.SEATS_NO,
@@ -64,9 +56,10 @@
             AIRLINE a ON f.USER_ID = a.USER_ID
     </select>
     
+
     <select id="selectListForUpdateDtos" parameterType="int" resultType="SeatsDto">
     SELECT * FROM seats WHERE flight_id = #{flightId} FOR UPDATE
-</select>
+	</select>
 		
 	<select id= "flightPassangerInfo" resultType="FlightPassangerInfoVO">
 				SELECT 

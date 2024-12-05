@@ -16,14 +16,14 @@ public class GraphRestController {
     @Autowired
     private GraphDao graphDataDao;
 
-    // 특정 사용자 ID로 결제 및 항공사 정보를 조회
+    //params 항공사 정보를 조회
     @GetMapping("/airlinePayment")
     public List<FlightPaymentVO> flightPayments(@RequestParam("userId") String userId) {
         return graphDataDao.flightPayment(userId);
     }
     
 
-    // 모든 사용자에 대한 결제 및 항공사 정보를 조회
+    // 모든 항공사 결제정보 조회
     @GetMapping("/allFlightPayment")
     public List<FlightPaymentVO> allFlightPayments() {
         return graphDataDao.allflightPayment();

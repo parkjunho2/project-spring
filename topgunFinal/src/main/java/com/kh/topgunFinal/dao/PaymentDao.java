@@ -22,7 +22,6 @@ public class PaymentDao {
     public int payServiceSequence(){
         return sqlSession.selectOne("payment.payServiceSequence");
     }
-    
     public int paymentSequence(){
         return sqlSession.selectOne("payment.paymentSequence");
     }
@@ -44,6 +43,7 @@ public class PaymentDao {
 	public List<PaymentDetailDto> selectDetailList(int paymentNo){
 		return sqlSession.selectList("payment.findDetail", paymentNo);
 	}
+	//paymentDto+paymentDetailDto+flightVO
 	public List<PaymentTotalVO> selectTotalList(String userId){
 		return sqlSession.selectList("payment.findTotal", userId);
 	}
@@ -71,7 +71,7 @@ public class PaymentDao {
 	public boolean updatePaymentDetail(PaymentDetailDto paymentDetailDto) {
 	    return sqlSession.update("payment.paymentDetailUpdate", paymentDetailDto) > 0;
 	}
-	// 좌석과 항공편 정보를 조회하는 메서드
+	// 좌석과 항공편 정보를 조회
     public List<SeatsFlightInfoVO> seatsFlightInfo(int flightId) {
         return sqlSession.selectList("payment.seatsFlightInfo", flightId);
     }

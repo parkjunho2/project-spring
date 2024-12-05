@@ -69,9 +69,9 @@ public class SeatsRestController {
 	private SqlSession sqlSession;
 
 	// 좌석 조회
-	@GetMapping("/{flightId}") // 비워두면 /seats/{flightId}에 대한 GET 요청이 됩니다.
+	@GetMapping("/{flightId}")
 	public List<SeatsDto> list(@PathVariable int flightId) {
-		return seatsDao.selectList(flightId); // 항공편 ID를 DAO 메서드에 전달
+		return seatsDao.selectList(flightId);
 	}
 
 	// 항공편 정보 조회
@@ -122,11 +122,9 @@ public class SeatsRestController {
 				buffer.append(seatDto.getSeatsRank());
 				buffer.append(seatDto.getSeatsNumber() + " ");
 			}
-		}
-		if (request.getSeatsList().size() >= 2) { // 2좌석 이상 구매시
+		}if (request.getSeatsList().size() >= 2) { // 2좌석 이상 구매시
 			buffer.append(" 외 " + (request.getSeatsList().size() - 1) + "건 ");
 		}
-		// payService #4에 body에 해당
 		// ready 준비 (입력)
 		PayReadyRequestVO requestVO = new PayReadyRequestVO();
 		requestVO.setPartnerOrderId(paymentDao.payServiceSequence());// 주문번호 Random
@@ -136,10 +134,8 @@ public class SeatsRestController {
 		requestVO.setApprovalUrl(request.getApprovalUrl());
 		requestVO.setCancelUrl(request.getCancelUrl());
 		requestVO.setFailUrl(request.getFailUrl());
-		// ready 처리 (입력된 값을) , payservice로 가서 ready #4에 requestVO 입력
-		PayReadyResponseVO responseVO = payService.ready(requestVO);
-		// ready 출력 PayService response로부터 tid,url,partner_order_id, partner_user_id 받아옴
-		return responseVO;
+		PayReadyResponseVO responseVO = payService.ready(requestVO); // ready 처리 (입력된 값을) , payservice로 가서 ready #4에 requestVO 입력
+		return responseVO;// ready 출력 PayService response로부터 tid,url,partner_order_id, partner_user_id 받아옴
 	}
 
 	// response에 받은 tid ,partner_order_id, partner_user_id , pg_token 전달
@@ -238,7 +234,7 @@ public class SeatsRestController {
 		return list;
 	}
 
-	// 모든목록 한번에
+	// 결제된 모든목록 조회
 	@GetMapping("/paymentTotalList")
 	public List<PaymentTotalVO> paymentTotalList(@RequestHeader("Authorization") String token) {
 		UserClaimVO claimVO = tokenService.check(tokenService.removeBearer(token));

@@ -23,7 +23,7 @@ public class CreateSeatService {
 
 				// row 값을 알파벳으로 변환 ('A'는 65의 ASCII 코드)
 				char rowLetter = (char) ('A' + row - 1);
-				String seatNumber = rowLetter + String.valueOf(col); // "A1", "A2", ..., "B1", "B2"
+				String seatNumber = rowLetter + String.valueOf(col);
 
 				seat.setSeatsNumber(seatNumber); // 좌석 번호 설정
 
@@ -33,16 +33,14 @@ public class CreateSeatService {
 
 				// 좌석 가격 설정
 				if ("비즈니스".equals(seatRank)) {
-					seat.setSeatsPrice(80000); // 비즈니스 좌석이면 80,000원
+					seat.setSeatsPrice(80000); // 비즈니스 80,000원
 				} else {
-					seat.setSeatsPrice(0); // 이코노미 좌석이면 0원
+					seat.setSeatsPrice(0); // 이코노미 0원
 				}
-
 				// seatList에 추가
 				seatList.add(seat);
 			}
 		}
-
 		return seatList;
 	}
 }

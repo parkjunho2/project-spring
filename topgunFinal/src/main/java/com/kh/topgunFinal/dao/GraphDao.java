@@ -18,7 +18,7 @@ public class GraphDao {
         return sqlSession.selectList("graph.flightPayment", userId);
     }
     
-    // 모든 사용자에 대한 결제 및 항공사 정보를 조회
+    // 모든 항공사 결제 조회
     public List<FlightPaymentVO> allflightPayment() {
         return sqlSession.selectList("graph.allFlightPayment");
     }

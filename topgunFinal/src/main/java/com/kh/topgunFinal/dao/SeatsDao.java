@@ -36,17 +36,12 @@ public class SeatsDao {
 	public List<SeatsDto> selectListByFlightId(int flightId){
 		return sqlSession.selectList("seats.listByFlightId", flightId);
 	}
-	
-//	// 좌석 조회
-//	public SeatsDto selectOne(int seatsNo) {
-//		return sqlSession.selectOne("seats.selectOne", seatsNo);
-//	}
 
 	// 좌석 생성
 	public void insertList(int flightId) {
 	    List<SeatsDto> list = createSeatService.createList(seatRow, seatCol, flightId);
 	    for (SeatsDto seat : list) {
-	        sqlSession.insert("seats.insert", seat);  // 각 좌석을 개별적으로 삽입
+	        sqlSession.insert("seats.insert", seat);
 	    }
 	}
 	//항공기에 대한 좌석의 정보
@@ -59,10 +54,6 @@ public class SeatsDao {
 		return sqlSession.update("seats.usedSeats", seatsDto)>0;
 	}
 	
-	//결제 비관적락
-//	public List<SeatsDto> selectListForUpdateDtos(int flightId) {
-//	    return sqlSession.selectList("seats.selectListForUpdateDtos", flightId);
-//	}
 	//항공기 탑승자 명단
 	 public List<FlightPassangerInfoVO> passangerInfo(int flightId) {
 	        return sqlSession.selectList("flightPassangerInfo", flightId);
