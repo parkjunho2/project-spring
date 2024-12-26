@@ -215,4 +215,5 @@ FROM payment p
 LEFT JOIN flight f ON p.flight_id = f.flight_id
 WHERE p.payment_no = #{paymentNo}
 </select>	
+
 </mapper>

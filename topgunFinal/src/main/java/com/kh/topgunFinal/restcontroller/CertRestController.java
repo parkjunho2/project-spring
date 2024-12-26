@@ -17,7 +17,8 @@ import com.kh.topgunFinal.service.EmailService;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import jakarta.mail.MessagingException;
 
-@CrossOrigin(origins = { "http://localhost:3000" })
+
+@CrossOrigin(origins = {"http://localhost:3000", "https://localhost:3000"})
 @RestController
 @RequestMapping("/cert")
 public class CertRestController {

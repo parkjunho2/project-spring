@@ -95,4 +95,5 @@ public class PaymentDao {
 	public List<TimerVO> timerList(int paymentNo) {
 		return sqlSession.selectList("payment.timerList", paymentNo);  // selectList 사용
 	}
+	
 }

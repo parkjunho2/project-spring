@@ -2,6 +2,7 @@
 
 import java.util.List;
 
+import com.kh.topgunFinal.dto.SeatsDto;
 import com.kh.topgunFinal.vo.SeatsQtyVO;
 
 import lombok.Data;

@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 
 import lombok.Data;
 
+
+
 @Data
 @Service
 @ConfigurationProperties(prefix = "custom.email")
