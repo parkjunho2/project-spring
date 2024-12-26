@@ -17,7 +17,7 @@ import com.kh.topgunFinal.vo.UserClaimVO;
 import com.kh.topgunFinal.vo.WebsocketMessageMoreVO;
 import com.kh.topgunFinal.vo.WebsocketMessageVO;
 
-@CrossOrigin(origins = {"https://topguntravel.shop", "https://www.topguntravel.shop"})
+@CrossOrigin(origins = {"https://topguntravel.shop"})
 @RestController
 @RequestMapping("/room/{roomNo}")
 public class WebsocketRestController {

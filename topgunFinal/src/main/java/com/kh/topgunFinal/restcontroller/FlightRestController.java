@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 
 
-@CrossOrigin(origins = {"https://topguntravel.shop", "https://www.topguntravel.shop"})
+@CrossOrigin(origins = {"https://topguntravel.shop"})
 @RestController
 @RequestMapping("/flight")
 public class FlightRestController {
