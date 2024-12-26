@@ -16,7 +16,7 @@ import com.kh.topgunFinal.dao.NoticeDao;
 import com.kh.topgunFinal.dto.NoticeDto;
 import com.kh.topgunFinal.error.TargetNotFoundException;
 
-@CrossOrigin(origins = {"https://localhost:3000"}) // CORS 해제 설정
+@CrossOrigin(origins = {"https://topguntravel.shop", "https://www.topguntravel.shop"})
 @RestController
 @RequestMapping("/notice")
 public class NoticeRestController {
