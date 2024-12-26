@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 
 
-@CrossOrigin(origins = {"http://localhost:3000", "https://localhost:3000"})
+@CrossOrigin(origins = {"https://localhost:3000"})
 @RestController
 @RequestMapping("/flight")
 public class FlightRestController {

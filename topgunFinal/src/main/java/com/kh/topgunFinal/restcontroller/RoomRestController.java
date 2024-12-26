@@ -22,7 +22,7 @@ import com.kh.topgunFinal.service.TokenService;
 import com.kh.topgunFinal.vo.RoomVO;
 import com.kh.topgunFinal.vo.UserClaimVO;
 
-@CrossOrigin(origins = {"http://localhost:3000", "https://localhost:3000"})
+@CrossOrigin(origins = {"http://localhost:3000"})
 @RestController
 @RequestMapping("/room")
 public class RoomRestController {
