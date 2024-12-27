@@ -16,7 +16,7 @@ import com.kh.topgunFinal.dao.NoticeDao;
 import com.kh.topgunFinal.dto.NoticeDto;
 import com.kh.topgunFinal.error.TargetNotFoundException;
 
-@CrossOrigin(origins = {"https://topguntravel.shop"})
+@CrossOrigin(origins = {"http://localhost:3000", "https://topguntravel.shop", "https://api.topguntravel.shop"})
 @RestController
 @RequestMapping("/notice")
 public class NoticeRestController {

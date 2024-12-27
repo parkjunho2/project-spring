@@ -20,7 +20,7 @@ import com.kh.topgunFinal.dao.FlightDao;
 import com.kh.topgunFinal.dao.SeatsDao;
 import com.kh.topgunFinal.dto.FlightDto;
 
-@CrossOrigin(origins = {"https://topguntravel.shop"})
+@CrossOrigin(origins = {"http://localhost:3000"})
 @RestController
 @RequestMapping("/admin")
 public class AdminFlightRestController {
