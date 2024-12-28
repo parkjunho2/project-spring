@@ -16,7 +16,7 @@ import com.kh.topgunFinal.dao.NoticeDao;
 import com.kh.topgunFinal.dto.NoticeDto;
 import com.kh.topgunFinal.error.TargetNotFoundException;
 
-@CrossOrigin(origins = {"http://localhost:3000"})
+@CrossOrigin(origins = {"https://localhost:3000"})
 @RestController
 @RequestMapping("/notice")
 public class NoticeRestController {
@@ -32,7 +32,7 @@ public class NoticeRestController {
     }
 
     // 공지사항 목록 조회
-    @GetMapping("/") // Read (목록) - 200, 500
+    @GetMapping() // Read (목록) - 200, 500
     public List<NoticeDto> list() {
         return noticeDao.selectList();
     }
