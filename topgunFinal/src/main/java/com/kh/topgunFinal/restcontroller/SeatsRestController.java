@@ -45,7 +45,7 @@ import com.kh.topgunFinal.vo.pay.PayOrderResponseVO;
 import com.kh.topgunFinal.vo.pay.PayReadyRequestVO;
 import com.kh.topgunFinal.vo.pay.PayReadyResponseVO;
 
-@CrossOrigin(origins = {"https://topguntravel.shop"})
+@CrossOrigin(origins = {"http://localhost:3000"})
 @RestController
 @RequestMapping("/seats")
 public class SeatsRestController {
