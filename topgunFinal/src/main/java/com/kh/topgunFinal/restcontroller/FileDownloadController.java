@@ -16,7 +16,7 @@ import com.kh.topgunFinal.service.AttachmentService;
 
 //사용자에게 파일을 전송하는 컨트롤러
 //이 컨트롤러는 화면이 아니라 데이터를 사용자에게 보냅니다!
-@CrossOrigin(origins = {"https://localhost:3000"})
+@CrossOrigin(origins = {"https://topguntravel.shop"})
 @RestController
 @RequestMapping("/attach")
 public class FileDownloadController {

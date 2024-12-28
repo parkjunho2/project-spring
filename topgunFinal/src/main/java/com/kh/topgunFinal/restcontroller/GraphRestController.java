@@ -8,7 +8,7 @@ import com.kh.topgunFinal.vo.FlightPaymentVO;
 
 import java.util.List;
 
-@CrossOrigin(origins = {"https://localhost:3000"})
+@CrossOrigin(origins = {"https://topguntravel.shop"})
 @RestController
 @RequestMapping("/graph")
 public class GraphRestController {
