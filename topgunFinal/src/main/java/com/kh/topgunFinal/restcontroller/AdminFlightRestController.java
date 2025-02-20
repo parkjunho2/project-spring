@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.kh.topgunFinal.dao.AdminFlightDao;
 import com.kh.topgunFinal.dao.FlightDao;
@@ -24,7 +25,10 @@ import com.kh.topgunFinal.dto.FlightDto;
 @RestController
 @RequestMapping("/admin")
 public class AdminFlightRestController {
-
+	String url =ServletUriComponentsBuilder
+			.fromCurrentContextPath()
+			.build().toUriString();
+	
 	@Autowired
 	private AdminFlightDao adminFlightDao;
 	
