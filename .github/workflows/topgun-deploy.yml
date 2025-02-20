@@ -20,6 +20,13 @@ jobs:
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script_stop: true
           script: |
+            # Add the GitHub SSH key to the EC2 instance
+            mkdir -p ~/.ssh
+            echo "${{ secrets.GITHUB_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+            chmod 600 ~/.ssh/id_rsa
+            ssh-keyscan github.com >> ~/.ssh/known_hosts
+
+            # Run the git pull and deploy commands
             cd ~/.ssh/project-spring
             git pull origin main
             cd topgunFinal
