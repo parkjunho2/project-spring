@@ -1,25 +1,30 @@
-name: Deploy to ec2
+name: Deploy to EC2
 
 on:
-    push:
-        branches:
-            - main
+  push:
+    branches:
+      - main
 
 jobs:
-    server-Deploy:
-        runs-on: ubuntu-latest
-        steps:
-            - name: ssh로 ec2에 접속
-              uses: appleboy/ssh-action@v1.0.3
-              with:
-                host: ${{ secrets.EC2_HOST }}
-                username: ${{ secrets.EC2_USERNAME }}
-                key: ${{ secrets.EC2_PRIVATE_KEY }}
-                script_stop: true
-                script: |
-                    cd ~/.ssh/project-spring
-                    git pull origin main
-                    cd topgunFinal
-                    mvn clean package -DskipTests
-                    sudo fuser -k -n tcp 8080 || true
-                    java -Duser.timezone=Asia/Seoul -jar target/*SNAPSHOT.war > ./output.log 2>&1 &
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout the repository
+      uses: actions/checkout@v2
+
+    - name: SSH into EC2 and Deploy
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USERNAME }}
+        key: ${{ secrets.EC2_PRIVATE_KEY }}
+        port: 22
+        script_stop: true
+        script: |
+          cd ~/.ssh/project-spring
+          git pull origin main
+          cd topgunFinal
+          mvn clean package -DskipTests
+          sudo fuser -k -n tcp 8080 || true
+          java -Duser.timezone=Asia/Seoul -jar target/*SNAPSHOT.war > ./output.log 2>&1 &
