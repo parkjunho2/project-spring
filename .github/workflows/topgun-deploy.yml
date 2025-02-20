@@ -18,6 +18,13 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.EC2_PRIVATE_KEY }}
 
+      - name: Debug SSH Key
+        run: |
+          echo "SSH key debug:"
+          ssh-add -l
+          ssh-add -D  # 모든 키 제거
+          ssh-add -k ~/.ssh/id_rsa  # SSH 키 추가
+
       - name: Deploy to EC2
         run: |
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@${{ secrets.EC2_IP }} << 'EOF'
