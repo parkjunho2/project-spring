@@ -26,10 +26,15 @@ jobs:
             mvn clean package -DskipTests
             sudo fuser -k -n tcp 8080 || true
             java -Duser.timezone=Asia/Seoul -jar target/*SNAPSHOT.war > ./output.log 2>&1 &
-      
+
       - name: Set up GitHub SSH key
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa  # GitHub용 SSH private key
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan github.com >> ~/.ssh/known_hosts
+          ssh-keyscan github.com >> ~/.ssh/known_hosts  # GitHub의 공개키를 known_hosts에 추가
+          
+      - name: Pull code from GitHub
+        run: |
+          cd ~/.ssh/project-spring
+          git pull origin main  # GitHub에서 코드 받기
