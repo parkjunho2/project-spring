@@ -30,6 +30,6 @@ jobs:
       - name: Set up GitHub SSH key
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.GITHUB_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa  # GitHub용 SSH private key
+          echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa  # GitHub용 SSH private key
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan github.com >> ~/.ssh/known_hosts
