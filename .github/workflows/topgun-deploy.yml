@@ -22,7 +22,7 @@ jobs:
             cd /home/ubuntu/.ssh/project-spring
             rm -f /home/ubuntu/.ssh/project-spring/topgunFinal/src/main/resources/application.properties
             git pull origin main
-            echo "$APPLICATION_PROPERTIES" > /home/ubuntu/.ssh/project-spring/topgunFinal/src/main/resources/application.propertie
+            echo "$APPLICATION_PROPERTIES" > /home/ubuntu/.ssh/project-spring/topgunFinal/src/main/resources/application.properties
             cd topgunFinal
             mvn clean package -DskipTests
             sudo fuser -k -n tcp 8080 || true
