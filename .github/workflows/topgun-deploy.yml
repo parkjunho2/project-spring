@@ -11,13 +11,18 @@ jobs:
     steps:
       - name: action을 통해 ec2 접속
         uses: appleboy/ssh-action@v1.2.1
+        env:
+          APPLICATION_PROPERTIES: ${{ secrets.APPLICATION_PROPERTIES}}
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_PRIVATE_KEY }}
+          envs: APPLICATION_PROPERTIES
           script: |
             cd /home/ubuntu/.ssh/project-spring
+            rm -rf src/main/resources/application.properties
             git pull origin main
+            echo "$APPLICATION_PROPERTIES" > src/main/resources/application.properties
             cd topgunFinal
             mvn clean package -DskipTests
             sudo fuser -k -n tcp 8080 || true
