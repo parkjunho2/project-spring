@@ -25,10 +25,6 @@ import com.kh.topgunFinal.dto.FlightDto;
 @RestController
 @RequestMapping("/admin")
 public class AdminFlightRestController {
-	String url =ServletUriComponentsBuilder
-			.fromCurrentContextPath()
-			.build().toUriString();
-			return url;
 	
 	@Autowired
 	private AdminFlightDao adminFlightDao;
@@ -36,6 +32,14 @@ public class AdminFlightRestController {
 	@Autowired
 	private SeatsDao seatsDao;
 	
+	@GetMapping("/url")
+    public String getUrl() {
+        String url = ServletUriComponentsBuilder
+                .fromCurrentContextPath()
+                .build().toUriString();
+        return url;
+    }
+
 	@GetMapping("/")
 	public List<FlightDto> list() {
 		return adminFlightDao.selectList();
