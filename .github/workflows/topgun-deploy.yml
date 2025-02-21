@@ -9,32 +9,17 @@ jobs:
   server-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout the code
-        uses: actions/checkout@v2
-
-      - name: Set up SSH for EC2
-        uses: appleboy/ssh-action@v1.0.3
+      - name: action을 통해 ec2 접속
+        uses: appleboy/ssh-action@v1.2.1
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_PRIVATE_KEY }}  # EC2 PEM 파일
-          script_stop: true
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
           script: |
-            cd ~/.ssh/project-spring
-            git pull origin main  # 이 부분에서 GitHub SSH 키 사용 필요
+            cd /home/ubuntu/.ssh/project-spring
+            git pull origin main
             cd topgunFinal
             mvn clean package -DskipTests
             sudo fuser -k -n tcp 8080 || true
-            java -Duser.timezone=Asia/Seoul -jar target/*SNAPSHOT.war > ./output.log 2>&1 &
-
-      - name: Set up GitHub SSH key
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa  # GitHub용 SSH private key
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan github.com >> ~/.ssh/known_hosts  # GitHub의 공개키를 known_hosts에 추가
-          
-      - name: Pull code from GitHub
-        run: |
-          cd ~/.ssh/project-spring
-          git pull origin main  # GitHub에서 코드 받기
+            cd target
+            java -Duser.timezone=Asia/Seoul -jar topgunFinal-0.0.1-SNAPSHOT.war > ~/output.log 2>&1 &
