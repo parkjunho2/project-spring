@@ -28,6 +28,7 @@ public class AdminFlightRestController {
 	String url =ServletUriComponentsBuilder
 			.fromCurrentContextPath()
 			.build().toUriString();
+			return currentUrl;
 	
 	@Autowired
 	private AdminFlightDao adminFlightDao;
