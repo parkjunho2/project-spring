@@ -15,14 +15,21 @@ import org.springframework.web.bind.annotation.RestController;
 import com.kh.topgunFinal.dao.NoticeDao;
 import com.kh.topgunFinal.dto.NoticeDto;
 import com.kh.topgunFinal.error.TargetNotFoundException;
+import org.springframework.web.bind.annotation.RequestParam;
 
-@CrossOrigin(origins = {"https://topguntravel.shop" , "https://homeweb.kro.kr"})
+
 @RestController
 @RequestMapping("/notice")
 public class NoticeRestController {
 
     @Autowired
     private NoticeDao noticeDao;
+
+    @GetMapping("/test")
+    public String getMethodName() {
+        return "배포테스트 성공";
+    }
+    
 
     // 공지사항 등록
     @PostMapping("/post") // Create (등록) - 200, 500
