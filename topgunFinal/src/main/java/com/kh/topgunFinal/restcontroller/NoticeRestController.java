@@ -27,7 +27,7 @@ public class NoticeRestController {
 
     @GetMapping("/test")
     public String getMethodName() {
-        return "배포테스트 성공";
+        return "배포테스트 성공!";
     }
     
 
